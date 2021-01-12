@@ -25,13 +25,13 @@ init:
 	mkdir -p ${BIN_DIR}
 
 local: init
-	go build -o=${BIN_DIR}/taskrun-watcher ./cmd/client
+	go build -o=${BIN_DIR}/terminator ./cmd/client
 
 build-linux: init
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o=${BIN_DIR}/taskrun-watcher ./cmd/client
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o=${BIN_DIR}/terminator ./cmd/client
 
 image: build-linux
-	docker build  . -t vincentpli/taskrun-watcher:$(TAG)
+	docker build  . -t vincentpli/terminator:$(TAG)
 
 update:
 	go mod download

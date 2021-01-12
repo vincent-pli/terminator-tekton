@@ -1,8 +1,8 @@
-FROM ubuntu
+FROM registry.redhat.io/ubi8/ubi-minimal
 
 WORKDIR /
 
-COPY _output/bin/taskrun-watcher /usr/local/bin
+COPY _output/bin/terminator /usr/local/bin
 
 ENTRYPOINT []
-CMD ["taskrun-watcher"]
+CMD ["terminator"]
