@@ -20,7 +20,7 @@ import (
 
 const (
 	//SINGALPATH is path for signal(file)
-	SINGALPATH = "/tekton/termination"
+	SINGALPATH = "/termination"
 	//ACTIVITYPATH is the folder which will list all running Activities
 	ACTIVITYPATH = "/jobActivities"
 	//STOPANDWAIT is signal for send stop request and wait for stop success
@@ -90,7 +90,7 @@ func main() {
 
 	if !os.IsNotExist(err) {
 		// unexpected error happen
-		log.Errorf("Detect signal path hit errir: %+v", err)
+		log.Errorf("Detect signal path hit error: %+v", err)
 		os.Exit(1)
 	}
 
@@ -101,7 +101,7 @@ func main() {
 			log.Infof("There is another Terminator working: %+v", err)
 			os.Exit(0)
 		}
-		log.Errorf("Create signal path hit errir: %+v", err)
+		log.Errorf("Create signal path hit error: %+v", err)
 		os.Exit(1)
 	}
 
@@ -214,7 +214,7 @@ func checkActivitiesPath(activitiesPath string) (bool, bool, error) {
 		noActivities = false
 
 		if strings.HasPrefix(info.Name(), PREFIXRUNNING) {
-			fmt.Printf("skipping a dir without errors: %+v \n", info.Name())
+			fmt.Printf("find response signal: %+v \n", info.Name())
 			allFinish = false
 			return nil
 		}
