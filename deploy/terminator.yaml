@@ -70,6 +70,13 @@ spec:
                 printf 404 | tee /tekton/results/cmd-2-exit-code
                 printf 500 | tee /tekton/results/cmd-3-exit-code
                 sleep 100
+              volumeMounts:
+              - name: terminator-volume
+                mountPath: /termination
+            volumes:
+            - name: terminator-volume
+              persistentVolumeClaim:
+                name: task-pv-claim
       - name: terminator
         taskSpec:
           params:
@@ -89,6 +96,13 @@ spec:
                 - --wait=$(params.wait)
                 - --monitor-interval=$(params.monitor-interval)
                 - --monitor-timeout=$(params.monitor-timeout)
+              volumeMounts:
+              - name: terminator-volume
+                mountPath: /termination
+            volumes:
+            - name: terminator-volume
+              persistentVolumeClaim:
+                name: task-pv-claim
           params:
           - name: name
             value: "$(params.name)"
