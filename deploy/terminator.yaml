@@ -73,10 +73,10 @@ spec:
               volumeMounts:
               - name: terminator-volume
                 mountPath: /termination
-            volumes:
-            - name: terminator-volume
-              persistentVolumeClaim:
-                name: task-pv-claim
+          volumes:
+          - name: terminator-volume
+            persistentVolumeClaim:
+              name: task-pv-claim
       - name: terminator
         taskSpec:
           params:
@@ -99,20 +99,20 @@ spec:
               volumeMounts:
               - name: terminator-volume
                 mountPath: /termination
-            volumes:
-            - name: terminator-volume
-              persistentVolumeClaim:
-                name: task-pv-claim
-          params:
-          - name: name
-            value: "$(params.name)"
-          - name: namespace
-            value: "$(params.namespace)"
-          - name: send-stop
-            value: "$(params.send-stop)"
-          - name: wait
-            value: "$(params.wait)"
-          - name: monitor-interval
-            value: "$(params.monitor-interval)"
-          - name: c
-            value: "$(params.monitor-timeout)"
+          volumes:
+          - name: terminator-volume
+            persistentVolumeClaim:
+              name: task-pv-claim
+        params:
+        - name: name
+          value: "$(params.name)"
+        - name: namespace
+          value: "$(params.namespace)"
+        - name: send-stop
+          value: "$(params.send-stop)"
+        - name: wait
+          value: "$(params.wait)"
+        - name: monitor-interval
+          value: "$(params.monitor-interval)"
+        - name: c
+          value: "$(params.monitor-timeout)"
