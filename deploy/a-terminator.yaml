@@ -5,20 +5,26 @@ metadata:
   labels:
     tekton.dev/ttl: "60"
 spec:
-  serviceAccountName: "tekton-object-role-sa"
+  serviceAccountName: "rete-limit"
   params:
   - name: namespace
     value: "default"
   - name: name
     value: "terminator-pr"
-  - name: sendStop
+  - name: send-stop
+    value: "true"
+  - name: wait
     value: "false"
-  - name: waitforFinish
-    value: "false"
-  - name: monitorInterval
+  - name: monitor-interval
     value: "2"
-  - name: monitorTimeout
+  - name: monitor-timeout
     value: "30"
+  podtemplate:
+    nodeSelector:
+      master: "true"
+    securityContext:
+      runAsUser: 1000
+      fsGroup: 2000
   pipelineSpec:
     params:
     - name: name
@@ -68,7 +74,18 @@ spec:
                 printf 200 | tee /tekton/results/cmd-1-exit-code
                 printf 404 | tee /tekton/results/cmd-2-exit-code
                 printf 500 | tee /tekton/results/cmd-3-exit-code
-                sleep 100
+                sleep 20
+                touch /termination/default/terminator-pr/runing-xxxxxxxx
+                sleep 60
+                touch /termination/default/terminator-pr/finished-xxxxxxxx
+              volumeMounts:
+              - name: terminator-volume
+                mountPath: /termination
+          volumes:
+          - name: terminator-volume
+            #emptyDir: {}
+            persistentVolumeClaim:
+              claimName: nfs-pvc
       - name: terminator
         taskSpec:
           params:
@@ -80,7 +97,7 @@ spec:
           - name: monitor-timeout
           steps:
             - name: main
-              image: docker.io/vincentpli/terminator:v0.0.5
+              image: docker.io/vincentpli/terminator:v0.1.1
               args:
                 - --name=$(params.name)
                 - --namespace=$(params.namespace)
@@ -93,9 +110,9 @@ spec:
                 mountPath: /termination
           volumes:
           - name: terminator-volume
-            emptyDir: {}
-            #persistentVolumeClaim:
-            #claimName: nfs-pvc
+            #emptyDir: {}
+            persistentVolumeClaim:
+              claimName: nfs-pvc
         params:
         - name: name
           value: "$(params.name)"
