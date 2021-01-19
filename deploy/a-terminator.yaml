@@ -1,0 +1,111 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: terminator-pr
+  labels:
+    tekton.dev/ttl: "60"
+spec:
+  serviceAccountName: "tekton-object-role-sa"
+  params:
+  - name: namespace
+    value: "default"
+  - name: name
+    value: "terminator-pr"
+  - name: sendStop
+    value: "false"
+  - name: waitforFinish
+    value: "false"
+  - name: monitorInterval
+    value: "2"
+  - name: monitorTimeout
+    value: "30"
+  pipelineSpec:
+    params:
+    - name: name
+      description: "Name of the original Pipelinerun, no default"
+      type: string
+    - name: namespace
+      description: "Namespace of the original Pipelinerun, no default"
+      type: string
+    - name: send-stop
+      description: "Boolean, express send stop signal or not, default: false"
+      type: string
+      default: "false"
+    - name: wait
+      description: "Boolean, express wait for response or not, default: false"
+      type: string
+      default: "false"
+    - name: monitor-interval
+      description: "watch interval, default: 2 sec"
+      type: string
+      default: "2"
+    - name: monitor-timeout
+      description: "timeout duration when no response signal, default: 60 sec"
+      type: string
+      default: "60"
+    tasks:
+      - name: job-activity-fake-run-cmd # when expression using parameter, evaluates to true
+        taskSpec:
+          metadata:
+            labels:
+              pipelines.kubeflow.org/cache_id: ""
+              pipelines.kubeflow.org/cache_enabled: "true"
+              pipelines.kubeflow.org/pipelinename: "checkpoint-pr"
+              pipelines.kubeflow.org/generation: "3"
+            annotations:
+              tekton.dev/template: ""
+          results:
+            - name: cmd-1-exit-code
+              description: indicates exit code for fake command
+            - name: cmd-2-exit-code
+              description: indicates exit code for fake command
+            - name: cmd-3-exit-code
+              description: indicates exit code for fake command
+          steps:
+            - name: write-exit-code
+              image: ubuntu
+              script: |
+                printf 200 | tee /tekton/results/cmd-1-exit-code
+                printf 404 | tee /tekton/results/cmd-2-exit-code
+                printf 500 | tee /tekton/results/cmd-3-exit-code
+                sleep 100
+      - name: terminator
+        taskSpec:
+          params:
+          - name: name
+          - name: namespace
+          - name: send-stop
+          - name: wait
+          - name: monitor-interval
+          - name: monitor-timeout
+          steps:
+            - name: main
+              image: docker.io/vincentpli/terminator:v0.0.5
+              args:
+                - --name=$(params.name)
+                - --namespace=$(params.namespace)
+                - --send-stop=$(params.send-stop)
+                - --wait=$(params.wait)
+                - --monitor-interval=$(params.monitor-interval)
+                - --monitor-timeout=$(params.monitor-timeout)
+              volumeMounts:
+              - name: terminator-volume
+                mountPath: /termination
+          volumes:
+          - name: terminator-volume
+            emptyDir: {}
+            #persistentVolumeClaim:
+            #claimName: nfs-pvc
+        params:
+        - name: name
+          value: "$(params.name)"
+        - name: namespace
+          value: "$(params.namespace)"
+        - name: send-stop
+          value: "$(params.send-stop)"
+        - name: wait
+          value: "$(params.wait)"
+        - name: monitor-interval
+          value: "$(params.monitor-interval)"
+        - name: monitor-timeout
+          value: "$(params.monitor-timeout)"
