@@ -22,28 +22,28 @@ spec:
     value: "30"
   pipelineSpec:
     params:
-      - name: name
-        description: "Name of the original Pipelinerun, no default"
-        type: string
-      - name: namespace
-        description: "Namespace of the original Pipelinerun, no default"
-        type: string
-      - name: send-stop
-        description: "Boolean, express send stop signal or not, default: false"
-        type: string
-        default: "false"
-      - name: wait
-        description: "Boolean, express wait for response or not, default: false"
-        type: string
-        default: "false"
-      - name: monitor-interval
-        description: "watch interval, default: 2 sec"
-        type: string
-        default: "2"
-      - name: monitor-timeout
-        description: "timeout duration when no response signal, default: 60 sec"
-        type: string
-        default: "60"
+    - name: name
+      description: "Name of the original Pipelinerun, no default"
+      type: string
+    - name: namespace
+      description: "Namespace of the original Pipelinerun, no default"
+      type: string
+    - name: send-stop
+      description: "Boolean, express send stop signal or not, default: false"
+      type: string
+      default: "false"
+    - name: wait
+      description: "Boolean, express wait for response or not, default: false"
+      type: string
+      default: "false"
+    - name: monitor-interval
+      description: "watch interval, default: 2 sec"
+      type: string
+      default: "2"
+    - name: monitor-timeout
+      description: "timeout duration when no response signal, default: 60 sec"
+      type: string
+      default: "60"
     tasks:
       - name: job-activity-fake-run-cmd # when expression using parameter, evaluates to true
         taskSpec:
@@ -76,7 +76,7 @@ spec:
           volumes:
           - name: terminator-volume
             persistentVolumeClaim:
-              name: task-pv-claim
+              claimName: task-pv-claim
       - name: terminator
         taskSpec:
           params:
