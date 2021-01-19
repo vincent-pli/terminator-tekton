@@ -242,7 +242,7 @@ func cancelPipelinerun(client tektoncdclientset.Interface, namespace, name strin
 	}
 
 	pr.Spec.Status = v1beta1.PipelineRunSpecStatusCancelled
-	_, err = client.TektonV1beta1().PipelineRuns(namespace).UpdateStatus(context.TODO(), pr, metav1.UpdateOptions{})
+	_, err = client.TektonV1beta1().PipelineRuns(namespace).Update(context.TODO(), pr, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
@@ -258,7 +258,7 @@ func pausePipelinerun(client tektoncdclientset.Interface, namespace, name string
 	}
 
 	pr.Spec.Status = "PipelineRunPending"
-	_, err = client.TektonV1beta1().PipelineRuns(namespace).UpdateStatus(context.TODO(), pr, metav1.UpdateOptions{})
+	_, err = client.TektonV1beta1().PipelineRuns(namespace).Update(context.TODO(), pr, metav1.UpdateOptions{})
 	if err != nil {
 		return err
 	}
