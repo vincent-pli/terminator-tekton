@@ -67,11 +67,11 @@ func main() {
 	}
 
 	//pause the pipeline, waiting for https://github.com/tektoncd/pipeline/pull/3522 merged
-	err = pausePipelinerun(tektonClient, namespace, name)
-	if err != nil {
-		log.Errorf("Pause pipelinerun failed: %+v:", err)
-		os.Exit(1)
-	}
+	// err = pausePipelinerun(tektonClient, namespace, name)
+	// if err != nil {
+	// 	log.Errorf("Pause pipelinerun failed: %+v:", err)
+	// 	os.Exit(1)
+	// }
 
 	//if no send stop signal and no wait, the cancel the pipeline immediatly
 	if !sendStop && !waitforFinish {
