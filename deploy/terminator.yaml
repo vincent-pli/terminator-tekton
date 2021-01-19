@@ -102,7 +102,7 @@ spec:
           volumes:
           - name: terminator-volume
             persistentVolumeClaim:
-              name: task-pv-claim
+              claimName: task-pv-claim
         params:
         - name: name
           value: "$(params.name)"
