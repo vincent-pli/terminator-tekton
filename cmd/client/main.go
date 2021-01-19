@@ -67,6 +67,11 @@ func main() {
 	}
 
 	//pause the pipeline, waiting for https://github.com/tektoncd/pipeline/pull/3522 merged
+	err = pausePipelinerun(tektonClient, namespace, name)
+	if err != nil {
+		log.Errorf("Pause pipelinerun failed: %+v:", err)
+		os.Exit(1)
+	}
 
 	//if no send stop signal and no wait, the cancel the pipeline immediatly
 	if !sendStop && !waitforFinish {
@@ -237,6 +242,22 @@ func cancelPipelinerun(client tektoncdclientset.Interface, namespace, name strin
 	}
 
 	pr.Spec.Status = v1beta1.PipelineRunSpecStatusCancelled
+	_, err = client.TektonV1beta1().PipelineRuns(namespace).UpdateStatus(context.TODO(), pr, metav1.UpdateOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func pausePipelinerun(client tektoncdclientset.Interface, namespace, name string) error {
+	pr, err := client.TektonV1beta1().PipelineRuns(namespace).Get(context.TODO(), name, metav1.GetOptions{})
+	if err != nil {
+		fmt.Printf("Get Pipelinerun: %s failed: %+v", namespace+"/"+name, err)
+		os.Exit(1)
+	}
+
+	pr.Spec.Status = "PipelineRunPending"
 	_, err = client.TektonV1beta1().PipelineRuns(namespace).UpdateStatus(context.TODO(), pr, metav1.UpdateOptions{})
 	if err != nil {
 		return err

@@ -114,5 +114,5 @@ spec:
           value: "$(params.wait)"
         - name: monitor-interval
           value: "$(params.monitor-interval)"
-        - name: c
+        - name: monitor-timeout
           value: "$(params.monitor-timeout)"
