@@ -99,7 +99,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = os.MkdirAll(signalPath+ACTIVITYPATH, 7777)
+	err = os.MkdirAll(signalPath+ACTIVITYPATH, 0777)
 	if err != nil {
 		if os.IsExist(err) {
 			//already existed
@@ -151,13 +151,15 @@ func main() {
 	}
 
 	//cancel the pipelinerun
+	//fmt.Println("should cancel, but not")
+	
 	err = cancelPipelinerun(tektonClient, namespace, name)
 	if err != nil {
 		log.Errorf("Cancel pipelinerun failed: %+v:", err)
 		os.Exit(1)
 	}
-
-	os.Exit(0)
+	
+	//os.Exit(0)
 }
 
 func sendSingal(signalPath string, signal string) error {
@@ -183,7 +185,6 @@ func checkResponseSignal(monitorIntervalI int, timeoutSec int, activitiesPath st
 	err := wait.PollImmediateInfinite(time.Second*duration,
 		func() (bool, error) {
 			noActivities, allFinish, err := checkActivitiesPath(activitiesPath)
-
 			if err == nil {
 				if noActivities {
 					lastedTime := time.Since(startTime)
@@ -216,6 +217,11 @@ func checkActivitiesPath(activitiesPath string) (bool, bool, error) {
 			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", path, err)
 			return err
 		}
+
+		if !strings.HasPrefix(info.Name(), PREFIXRUNNING) && !strings.HasPrefix(info.Name(), PREFIXFINISHED) {
+			return nil
+		}
+
 		noActivities = false
 
 		if strings.HasPrefix(info.Name(), PREFIXRUNNING) {
